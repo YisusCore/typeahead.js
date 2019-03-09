@@ -423,6 +423,7 @@
             this.identify = o.identify || _.stringify;
             this.datumTokenizer = o.datumTokenizer;
             this.queryTokenizer = o.queryTokenizer;
+			this.idkSearch = o.idkSearch || false;
             this.reset();
         }
         _.mixin(SearchIndex.prototype, {
@@ -456,7 +457,17 @@
             },
             search: function search(query) {
                 var that = this, tokens, matches;
+				
+				if (this.idkSearch)
+				{
+					if (this.datums[query])
+					{
+						return [this.datums[query]];
+					}
+				}
+				
                 tokens = normalizeTokens(this.queryTokenizer(query));
+				
                 _.each(tokens, function(token) {
                     var node, chars, ch, ids;
                     if (matches && matches.length === 0) {
@@ -812,7 +823,8 @@
             this.index = new SearchIndex({
                 identify: this.identify,
                 datumTokenizer: o.datumTokenizer,
-                queryTokenizer: o.queryTokenizer
+                queryTokenizer: o.queryTokenizer,
+				idkSearch:o.idkSearch ||false
             });
             o.initialize !== false && this.initialize();
         }
